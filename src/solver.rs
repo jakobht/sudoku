@@ -43,6 +43,7 @@ impl FilledCache {
         f
     }
 
+    #[inline(always)] 
     fn add_num(&mut self, row: usize, col: usize, num: u8, board: &Board) -> bool {
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
         let num = num - 1;
@@ -55,7 +56,7 @@ impl FilledCache {
             true
         }
     }
-
+    #[inline(always)] 
     fn insert(&mut self, row: usize, col: usize, val: &Entry, board: &Board) -> bool {
         let r = match val {
             Entry::Empty => true,
@@ -65,6 +66,7 @@ impl FilledCache {
         r
     }
 
+    #[inline(always)] 
     fn remove_num(&mut self, row: usize, col: usize, num: u8, board: &Board) {
         let num = num - 1;
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
@@ -73,6 +75,7 @@ impl FilledCache {
         self.squares[sq_number][num as usize] = false;
     }
 
+    #[inline(always)] 
     fn remove(&mut self, row: usize, col: usize, val: &Entry, board: &Board) {
         match val {
             Entry::Empty => (),
