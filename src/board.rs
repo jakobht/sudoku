@@ -18,7 +18,7 @@ impl SimpleHash {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Entry {
     Empty,
     Num(u8),
