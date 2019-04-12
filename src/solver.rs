@@ -32,7 +32,7 @@ pub fn fill_board(board: &mut Board) {
 
         for n in start as usize..(board.size()+1) {
             board[row][col] = Entry::Num(n as u8);
-            if board.check_board() {
+            if board.check_board(row, col) {
                 next_cord(&mut row, &mut col, board.size());
                 continue 'main;
             }

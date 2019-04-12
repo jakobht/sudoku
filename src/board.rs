@@ -42,37 +42,29 @@ impl Board {
         }
     }
 
-    fn check_rows(&self) -> bool {
-        self.board.iter().all(|row| {
-            let mut hm = SimpleHash::new(self.size());
-            row.iter().all(|v| hm.insert(v))
-        })
-    }
-
-    fn check_cols(&self) -> bool {
-        (0..self.size()).all(|i| {
-            let mut hm = SimpleHash::new(self.size());
-            (0..self.size()).all(|j| hm.insert(&self[j][i]) )
-        })
-    }
-
-    fn check_square(&self, square: usize) -> bool {
+    fn check_row(&self, row: usize) -> bool {
         let mut hm = SimpleHash::new(self.size());
-        let s_row = square / self.square_size();
-        let s_col = square % self.square_size();
-        let sq = self.square_size();
+        self.board[row].iter().all(|v| hm.insert(v))
+    }
 
-        (s_row*sq..s_row*sq+sq)
-        .all(|row| (s_col*sq..s_col*sq+sq)
+    fn check_col(&self, col: usize) -> bool {
+        let mut hm = SimpleHash::new(self.size());
+        (0..self.size()).all(|j| hm.insert(&self[j][col]) )
+    }
+
+    fn check_square(&self, row: usize, col: usize) -> bool {
+        let mut hm = SimpleHash::new(self.size());
+        let sq = self.square_size();
+        let start_row = row / sq * sq;
+        let start_col = col / sq * sq;
+        
+        (start_row..start_row+sq)
+        .all(|row| (start_col..start_col+sq)
         .all(|col| hm.insert(&self[row][col])))
     }
 
-    fn check_squares(&self) -> bool {
-        (0..self.size()).all(|s| self.check_square(s))
-    }
-
-    pub fn check_board(&self) -> bool {
-        self.check_rows() && self.check_cols() && self.check_squares()
+    pub fn check_board(&self, row: usize, col: usize) -> bool {
+        self.check_row(row) && self.check_col(col) && self.check_square(row, col)
     }
 }
 
