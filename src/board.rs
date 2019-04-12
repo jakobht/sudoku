@@ -12,6 +12,8 @@ impl SimpleHash {
     fn insert(&mut self, e: &Entry) -> bool {
         match e {
             Entry::Empty => true,
+            Entry::Clue(n) if self.vec[(n - 1) as usize] => false,
+            Entry::Clue(n) => { self.vec[(n - 1) as usize] = true; true }
             Entry::Num(n) if self.vec[(n - 1) as usize] => false,
             Entry::Num(n)  => { self.vec[(n - 1) as usize] = true; true }
         }
@@ -22,6 +24,7 @@ impl SimpleHash {
 pub enum Entry {
     Empty,
     Num(u8),
+    Clue(u8)
 }
 
 pub struct Board {
@@ -83,8 +86,9 @@ impl std::fmt::Display for Board {
                     write!(f, "| ")?
                 };
                 match num {
-                    Entry::Empty => write!(f, "_ ")?,
-                    Entry::Num(n) => write!(f, "{} ", n)?,
+                    Entry::Empty => write!(f, " _  ")?,
+                    Entry::Num(n) => write!(f, " {}  ", n)?,
+                    Entry::Clue(n) => write!(f, "-{}- ", n)?,
                 }
             }
             writeln!(f, "")?;
