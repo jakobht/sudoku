@@ -1,25 +1,5 @@
 use std::ops::{Index, IndexMut};
 
-struct SimpleHash {
-    vec: Vec<bool>
-}
-
-impl SimpleHash {
-    fn new(size: usize) -> SimpleHash {
-        SimpleHash { vec: vec!(false; size) }
-    }
-
-    fn insert(&mut self, e: &Entry) -> bool {
-        match e {
-            Entry::Empty => true,
-            Entry::Clue(n) if self.vec[(n - 1) as usize] => false,
-            Entry::Clue(n) => { self.vec[(n - 1) as usize] = true; true }
-            Entry::Num(n) if self.vec[(n - 1) as usize] => false,
-            Entry::Num(n)  => { self.vec[(n - 1) as usize] = true; true }
-        }
-    }
-}
-
 #[derive(Clone, Debug, PartialEq)]
 pub enum Entry {
     Empty,
@@ -43,31 +23,6 @@ impl Board {
             size: size,
             square_size: (size as f64).sqrt() as usize
         }
-    }
-
-    fn check_row(&self, row: usize) -> bool {
-        let mut hm = SimpleHash::new(self.size());
-        self.board[row].iter().all(|v| hm.insert(v))
-    }
-
-    fn check_col(&self, col: usize) -> bool {
-        let mut hm = SimpleHash::new(self.size());
-        (0..self.size()).all(|j| hm.insert(&self[j][col]) )
-    }
-
-    fn check_square(&self, row: usize, col: usize) -> bool {
-        let mut hm = SimpleHash::new(self.size());
-        let sq = self.square_size();
-        let start_row = row / sq * sq;
-        let start_col = col / sq * sq;
-        
-        (start_row..start_row+sq)
-        .all(|row| (start_col..start_col+sq)
-        .all(|col| hm.insert(&self[row][col])))
-    }
-
-    pub fn check_board(&self, row: usize, col: usize) -> bool {
-        self.check_row(row) && self.check_col(col) && self.check_square(row, col)
     }
 }
 
