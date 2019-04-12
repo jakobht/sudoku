@@ -22,17 +22,23 @@ fn prev_cord(row: &mut usize, col: &mut usize, size: usize) {
 
 #[derive(Debug)]
 struct FilledCache {
-    rows: Vec<Vec<bool>>,
-    cols: Vec<Vec<bool>>,
-    squares: Vec<Vec<bool>>,
+    rows: Vec<bool>,
+    cols: Vec<bool>,
+    squares: Vec<bool>,
+}
+
+macro_rules! get {
+    ($v:expr, $i:expr, $j:expr, $length:expr) => {
+        $v[$i*$length+$j as usize]
+    };
 }
 
 impl FilledCache {
     fn new(board: &Board) -> FilledCache {
         let mut f = FilledCache{
-            rows: vec![vec![false; board.size()]; board.size()],
-            cols: vec![vec![false; board.size()]; board.size()],
-            squares: vec![vec![false; board.size()]; board.size()],
+            rows: vec![false; board.size()*board.size()],
+            cols: vec![false; board.size()*board.size()],
+            squares: vec![false; board.size()*board.size()],
         };
 
         for (i, row) in board.board.iter().enumerate() {
@@ -47,12 +53,12 @@ impl FilledCache {
     fn add_num(&mut self, row: usize, col: usize, num: u8, board: &Board) -> bool {
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
         let num = num - 1;
-        if self.rows[row][num as usize] || self.cols[col][num as usize] || self.squares[sq_number][num as usize] {
+        if get!(self.rows, row, num, board.size()) || get!(self.cols, col, num, board.size()) || get!(self.squares, sq_number, num, board.size()) {
             false
         } else {
-            self.rows[row][num as usize] = true;
-            self.cols[col][num as usize] = true;
-            self.squares[sq_number][num as usize] = true;
+            get!(self.rows, row, num, board.size()) = true;
+            get!(self.cols, col, num, board.size()) = true;
+            get!(self.squares, sq_number, num, board.size()) = true;
             true
         }
     }
@@ -70,9 +76,9 @@ impl FilledCache {
     fn remove_num(&mut self, row: usize, col: usize, num: u8, board: &Board) {
         let num = num - 1;
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
-        self.rows[row][num as usize] = false;
-        self.cols[col][num as usize] = false;
-        self.squares[sq_number][num as usize] = false;
+        get!(self.rows, row, num, board.size()) = false;
+        get!(self.cols, col, num, board.size()) = false;
+        get!(self.squares, sq_number, num, board.size()) = false;
     }
 
     #[inline(always)] 
