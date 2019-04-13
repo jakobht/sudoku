@@ -7,6 +7,7 @@ pub enum Entry {
     Clue(u8)
 }
 
+#[derive(Clone)]
 pub struct Board {
     pub board: Vec<Vec<Entry>>,
     size: usize,
@@ -24,6 +25,20 @@ impl Board {
             square_size: (size as f64).sqrt() as usize
         }
     }
+
+    pub fn from_str(s: &str) -> Board {
+        let mut board = Board::new(9);
+        for (i, line) in s.lines().enumerate() {
+            for (j, n) in line.split_whitespace().enumerate() {
+                board[i][j] = match n.parse() {
+                    Ok(n) => Entry::Clue(n),
+                    Err(_) => Entry::Empty
+                }
+            }
+        }
+    board
+}
+
 }
 
 impl std::fmt::Display for Board {

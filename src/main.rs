@@ -5,22 +5,15 @@ use board::{Entry, Board};
 use solver::fill_board;
 use std::time::{SystemTime};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::Read;
 
 use std::env;
 
 fn load(file: &str) -> Board {
-    let mut board = Board::new(9);
-    let file = File::open(file).expect(&format!("Could not open file: {}", file));
-    for (i, line) in BufReader::new(file).lines().enumerate() {
-        for (j, n) in line.unwrap().split_whitespace().enumerate() {
-            board[i][j] = match n.parse() {
-                Ok(n) => Entry::Clue(n),
-                Err(_) => Entry::Empty
-            }
-        }
-    }
-    board
+    let mut file = File::open(file).expect(&format!("Could not open file: {}", file));
+    let mut s = String::new();
+    file.read_to_string(&mut s).unwrap();
+    Board::from_str(&s)
 }
 
 fn main() {

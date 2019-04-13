@@ -136,17 +136,20 @@ mod tests {
     use test::Bencher;
 
     #[bench]
-    fn bench_fill_9(b: &mut Bencher) {
+    fn bench_fill_hard(b: &mut Bencher) {
+        let s = 
+        "- - - - - - - - -
+        - - - - - 3 - 8 5
+        - - 1 - 2 - - - -
+        - - - 5 - 7 - - -
+        - - 4 - - - 1 - -
+        - 9 - - - - - - -
+        5 - - - - - - 7 3
+        - - 2 - 1 - - - -
+        - - - - 4 - - - 9";
+        let board_empty = Board::from_str(s);
         b.iter(|| {
-            let mut board = Board::new(9);
-            fill_board(&mut board);
-        });
-    }
-
-    #[bench]
-    fn bench_fill_16(b: &mut Bencher) {
-        b.iter(|| {
-            let mut board = Board::new(16);
+            let mut board = board_empty.clone();
             fill_board(&mut board);
         });
     }
