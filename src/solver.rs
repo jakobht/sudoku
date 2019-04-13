@@ -27,10 +27,10 @@ struct FilledCache {
     squares: Vec<bool>,
 }
 
-macro_rules! get {
-    ($v:expr, $i:expr, $j:expr, $length:expr) => {
-        $v[$i*$length+$j as usize]
-    };
+#[inline(always)] 
+fn get<'a>(v: &'a mut Vec<bool>, i: usize, j: u8, length: usize) -> &'a mut bool {
+    // unsafe { v.get_unchecked_mut(i*length+j as usize) }
+    &mut v[i*length+j as usize]
 }
 
 impl FilledCache {
@@ -53,12 +53,12 @@ impl FilledCache {
     fn add_num(&mut self, row: usize, col: usize, num: u8, board: &Board) -> bool {
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
         let num = num - 1;
-        if get!(self.rows, row, num, board.size()) || get!(self.cols, col, num, board.size()) || get!(self.squares, sq_number, num, board.size()) {
+        if *get(&mut self.rows, row, num, board.size()) || *get(&mut self.cols, col, num, board.size()) || *get(&mut self.squares, sq_number, num, board.size()) {
             false
         } else {
-            get!(self.rows, row, num, board.size()) = true;
-            get!(self.cols, col, num, board.size()) = true;
-            get!(self.squares, sq_number, num, board.size()) = true;
+            *get(&mut self.rows, row, num, board.size()) = true;
+            *get(&mut self.cols, col, num, board.size()) = true;
+            *get(&mut self.squares, sq_number, num, board.size()) = true;
             true
         }
     }
@@ -76,9 +76,9 @@ impl FilledCache {
     fn remove_num(&mut self, row: usize, col: usize, num: u8, board: &Board) {
         let num = num - 1;
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
-        get!(self.rows, row, num, board.size()) = false;
-        get!(self.cols, col, num, board.size()) = false;
-        get!(self.squares, sq_number, num, board.size()) = false;
+        *get(&mut self.rows, row, num, board.size()) = false;
+        *get(&mut self.cols, col, num, board.size()) = false;
+        *get(&mut self.squares, sq_number, num, board.size()) = false;
     }
 
     #[inline(always)] 
