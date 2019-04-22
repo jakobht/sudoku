@@ -2,24 +2,6 @@ extern crate test;
 
 use crate::board::{Board, Entry};
 
-fn next_cord(row: &mut usize, col: &mut usize, size: usize) {
-    if *col == size-1 {
-        *row += 1;
-        *col = 0;
-    } else {
-        *col += 1;
-    }
-}
-
-fn prev_cord(row: &mut usize, col: &mut usize, size: usize) {
-    if *col == 0 {
-        *row -= 1;
-        *col = size-1;
-    } else {
-        *col -= 1;
-    }
-}
-
 #[derive(Debug)]
 struct FilledCache {
     rows: Vec<bool>,
@@ -91,25 +73,37 @@ impl FilledCache {
     }
 }
 
+fn generate_order(board: &Board) -> Vec<(usize, usize)> {
+    let mut res = Vec::with_capacity(board.size() * board.size());
+    for row in 0..board.size() {
+        for col in 0..board.size() {
+            match board[row][col] {
+                Entry::Clue(_) => (),
+                _ => res.push((row, col)),
+            }
+        }
+    }
+    res
+}
+
 pub fn fill_board(board: &mut Board) {
-    let mut row = 0;
-    let mut col = 0;
+
+    let order = generate_order(board);
+
+    let mut current_cords = 0;
     let mut forward = true;
     let mut fc = FilledCache::new(&board);
 
-    'main: while row < board.size() && col < board.size() {
-        // if col == 0 {
-        //    println!("{}", board);
-        //    println!("");
-        //}
+    'main: while current_cords < order.len() {
+        let (row, col) = unsafe { *order.get_unchecked(current_cords) };
         let start = match board[row][col] {
             Entry::Empty => 1,
             Entry::Num(n) => n + 1,
             Entry::Clue(_n) => { 
                 if forward {
-                    next_cord(&mut row, &mut col, board.size()); 
+                    current_cords += 1; 
                 } else {
-                    prev_cord(&mut row, &mut col, board.size());
+                    current_cords -= 1;
                 }
                 continue 'main 
             } 
@@ -120,13 +114,13 @@ pub fn fill_board(board: &mut Board) {
             if fc.insert(row, col, &Entry::Num(n as u8), board) {
                 board[row][col] = Entry::Num(n as u8);
                 forward = true;
-                next_cord(&mut row, &mut col, board.size());
+                current_cords += 1;
                 continue 'main;
             }
         }
         board[row][col] = Entry::Empty;
         forward = false;
-        prev_cord(&mut row, &mut col, board.size());
+        current_cords -= 1;
     }
 }
 
