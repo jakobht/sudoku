@@ -5,3 +5,4 @@ authors = ["Jakob Haahr Taankvist"]
 edition = "2018"
 
 [dependencies]
+bit-vec = "0.5.1"

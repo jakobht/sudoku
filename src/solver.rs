@@ -1,5 +1,7 @@
 extern crate test;
+extern crate bit_vec;
 
+use bit_vec::*;
 use crate::board::{Board, Entry};
 
 fn next_cord(row: &mut usize, col: &mut usize, size: usize) {
@@ -22,23 +24,17 @@ fn prev_cord(row: &mut usize, col: &mut usize, size: usize) {
 
 #[derive(Debug)]
 struct FilledCache {
-    rows: Vec<bool>,
-    cols: Vec<bool>,
-    squares: Vec<bool>,
-}
-
-#[inline(always)] 
-fn get<'a>(v: &'a mut Vec<bool>, i: usize, j: u8, length: usize) -> &'a mut bool {
-    // unsafe { v.get_unchecked_mut(i*length+j as usize) }
-    &mut v[i*length+j as usize]
+    rows: BitVec,
+    cols: BitVec,
+    squares: BitVec,
 }
 
 impl FilledCache {
     fn new(board: &Board) -> FilledCache {
         let mut f = FilledCache{
-            rows: vec![false; board.size()*board.size()],
-            cols: vec![false; board.size()*board.size()],
-            squares: vec![false; board.size()*board.size()],
+            rows: BitVec::from_elem(board.size()*board.size(), false),
+            cols: BitVec::from_elem(board.size()*board.size(), false),
+            squares: BitVec::from_elem(board.size()*board.size(), false),
         };
 
         for (i, row) in board.board.iter().enumerate() {
@@ -52,13 +48,13 @@ impl FilledCache {
     #[inline(always)] 
     fn add_num(&mut self, row: usize, col: usize, num: u8, board: &Board) -> bool {
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
-        let num = num - 1;
-        if *get(&mut self.rows, row, num, board.size()) || *get(&mut self.cols, col, num, board.size()) || *get(&mut self.squares, sq_number, num, board.size()) {
+        let num = (num - 1) as usize;
+        if self.rows[row*board.size()+num] || self.cols[col*board.size()+num] || self.squares[sq_number*board.size()+num] {
             false
         } else {
-            *get(&mut self.rows, row, num, board.size()) = true;
-            *get(&mut self.cols, col, num, board.size()) = true;
-            *get(&mut self.squares, sq_number, num, board.size()) = true;
+            self.rows.set(row*board.size()+num, true);
+            self.cols.set(col*board.size()+num, true);
+            self.squares.set(sq_number*board.size()+num, true);
             true
         }
     }
@@ -74,11 +70,11 @@ impl FilledCache {
 
     #[inline(always)] 
     fn remove_num(&mut self, row: usize, col: usize, num: u8, board: &Board) {
-        let num = num - 1;
+        let num = (num - 1) as usize;
         let sq_number = row / board.square_size() * board.square_size() + col / board.square_size();
-        *get(&mut self.rows, row, num, board.size()) = false;
-        *get(&mut self.cols, col, num, board.size()) = false;
-        *get(&mut self.squares, sq_number, num, board.size()) = false;
+        self.rows.set(row*board.size()+num, false);
+        self.cols.set(col*board.size()+num, false);
+        self.squares.set(sq_number*board.size()+num, false);
     }
 
     #[inline(always)] 
