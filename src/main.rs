@@ -1,7 +1,7 @@
 #![feature(test)]
 mod board;
 mod solver;
-use board::{Board};
+use board::{Entry, Board};
 use solver::fill_board;
 use std::time::{SystemTime};
 use std::fs::File;
