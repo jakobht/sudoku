@@ -1,3 +1,4 @@
+#![feature(test)]
 mod board;
 mod solver;
 use board::Board;
